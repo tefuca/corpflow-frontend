@@ -1,0 +1,187 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   CRMS PROFESSIONAL THEME — GoodDay Inspired
+   ============================================ */
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 221 83% 53%;
+    --radius: 0.625rem;
+    
+    /* NEW: Added missing success and warning variables */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer components {
+  /* ── Cards ── */
+  .card-crms {
+    @apply rounded-xl border bg-card shadow-sm;
+  }
+  .card-crms-hover {
+    @apply card-crms transition-all duration-200 hover:shadow-md hover:border-border/80;
+  }
+
+  /* ── Section Headers ── */
+  .section-header {
+    @apply flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6;
+  }
+  .section-header-title {
+    @apply text-xl font-semibold tracking-tight text-foreground;
+  }
+  .section-header-subtitle {
+    @apply text-sm text-muted-foreground mt-0.5;
+  }
+
+  /* ── Tables ── */
+  .table-crms {
+    @apply w-full text-sm;
+  }
+  .table-crms thead tr {
+    @apply border-b bg-muted/30;
+  }
+  .table-crms th {
+    @apply text-left py-2.5 px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider;
+  }
+  .table-crms tbody tr {
+    @apply border-b last:border-b-0 transition-colors hover:bg-muted/40;
+  }
+  .table-crms td {
+    @apply py-3 px-4;
+  }
+
+  /* ── Status Badges ── */
+  .badge-base {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border;
+  }
+  .badge-draft    { @apply badge-base bg-slate-50 text-slate-700 border-slate-200; }
+  .badge-pending  { @apply badge-base bg-amber-50 text-amber-700 border-amber-200; }
+  .badge-approved { @apply badge-base bg-emerald-50 text-emerald-700 border-emerald-200; }
+  .badge-rejected { @apply badge-base bg-red-50 text-red-700 border-red-200; }
+  .badge-executed { @apply badge-base bg-blue-50 text-blue-700 border-blue-200; }
+  .badge-paid     { @apply badge-base bg-emerald-50 text-emerald-700 border-emerald-200; }
+  .badge-active   { @apply badge-base bg-emerald-50 text-emerald-700 border-emerald-200; }
+  .badge-inactive { @apply badge-base bg-slate-50 text-slate-600 border-slate-200; }
+  .badge-maintenance { @apply badge-base bg-orange-50 text-orange-700 border-orange-200; }
+  .badge-on-hold  { @apply badge-base bg-amber-50 text-amber-700 border-amber-200; }
+  .badge-completed { @apply badge-base bg-emerald-50 text-emerald-700 border-emerald-200; }
+  .badge-in-progress { @apply badge-base bg-blue-50 text-blue-700 border-blue-200; }
+  .badge-low      { @apply badge-base bg-amber-50 text-amber-700 border-amber-200; }
+  .badge-out      { @apply badge-base bg-red-50 text-red-700 border-red-200; }
+  .badge-scheduled { @apply badge-base bg-blue-50 text-blue-700 border-blue-200; }
+
+  /* ── Buttons ── */
+  .btn-crms {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-crms-primary {
+    @apply btn-crms bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4;
+  }
+  .btn-crms-secondary {
+    @apply btn-crms bg-secondary text-secondary-foreground hover:bg-secondary/80 h-9 px-4;
+  }
+  .btn-crms-ghost {
+    @apply btn-crms hover:bg-muted h-9 px-3;
+  }
+  .btn-crms-icon {
+    @apply btn-crms h-8 w-8 p-0;
+  }
+  .btn-crms-icon-sm {
+    @apply btn-crms h-7 w-7 p-0;
+  }
+
+  /* ── Inputs ── */
+  .input-crms {
+    @apply flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  /* ── Empty State ── */
+  .empty-state {
+    @apply flex flex-col items-center justify-center py-12 text-center;
+  }
+  .empty-state-icon {
+    @apply w-12 h-12 text-muted-foreground/30 mb-3;
+  }
+  .empty-state-title {
+    @apply text-sm font-medium text-muted-foreground;
+  }
+
+  /* ── KPI Cards ── */
+  .kpi-card {
+    @apply card-crms-hover p-5;
+  }
+  .kpi-card-label {
+    @apply text-sm font-medium text-muted-foreground;
+  }
+  .kpi-card-value {
+    @apply text-2xl font-bold tracking-tight mt-1;
+  }
+  .kpi-card-icon {
+    @apply p-2.5 rounded-lg;
+  }
+  .kpi-card-trend-up {
+    @apply text-xs font-medium text-emerald-600;
+  }
+  .kpi-card-trend-down {
+    @apply text-xs font-medium text-red-600;
+  }
+
+  /* ── Tabs ── */
+  .tabs-crms {
+    @apply flex gap-0 border-b mb-6;
+  }
+  .tab-crms {
+    @apply px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-muted-foreground transition-colors hover:text-foreground -mb-px;
+  }
+  .tab-crms-active {
+    @apply tab-crms border-primary text-primary;
+  }
+
+  /* ── Timeline ── */
+  .timeline-container {
+    @apply relative pl-8 space-y-8;
+  }
+  .timeline-line {
+    @apply absolute left-3 top-2 bottom-2 w-px bg-border;
+  }
+  .timeline-dot {
+    @apply absolute -left-5 top-1.5 w-2.5 h-2.5 rounded-full bg-card border-2 border-primary ring-4 ring-primary/10;
+  }
+  .timeline-icon-box {
+    @apply p-1.5 rounded-lg bg-muted;
+  }
+}
