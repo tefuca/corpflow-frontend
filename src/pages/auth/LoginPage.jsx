@@ -68,7 +68,7 @@ export default function LoginPage() {
         </form>
         
         <p className="text-center text-sm text-muted-foreground mt-6">
-          Default: admin / Admin@123
+          Default: admin / admin123
         </p>
       </div>
     </div>
