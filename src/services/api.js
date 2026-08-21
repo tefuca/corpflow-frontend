@@ -17,10 +17,10 @@ class ApiService {
   }
 
   // Auth
-  async login(email, password) {
-    return this.fetch('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
+  async login(username, password) {
+  return this.fetch('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ username, password }),
     })
   }
 
