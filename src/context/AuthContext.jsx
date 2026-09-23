@@ -11,6 +11,7 @@ export function AuthProvider({ children }) {
     return localStorage.getItem('currentRole') || ''
   })
 
+  // Restore session on mount
   useEffect(() => {
     const token = localStorage.getItem('token')
     const savedUser = localStorage.getItem('user')
@@ -46,7 +47,8 @@ export function AuthProvider({ children }) {
     const resBody = await res.json()
     console.log('🔑 Full login response:', resBody)
 
-    // FIX: Unwrap the TransformInterceptor response
+    // ⚠️ CRITICAL FIX: Unwrap the TransformInterceptor response
+    // The backend wraps everything in { data: {...}, message, statusCode }
     const data = resBody.data || resBody
     console.log('📦 Unwrapped data:', data)
     
@@ -58,12 +60,14 @@ export function AuthProvider({ children }) {
       throw new Error('Authentication failed: No token received from server')
     }
     
-    console.log('✅ Token received:', token.substring(0, 30) + '...')
+    console.log('✅ Token received successfully:', token.substring(0, 30) + '...')
     
+    // Store token & user
     localStorage.setItem('token', token)
     localStorage.setItem('user', JSON.stringify(userData))
     setUser(userData)
 
+    // Set initial role from backend response
     const roles = userData.roles || (userData.role ? [userData.role] : [])
     const initialRole = roles[0]?.name || roles[0] || currentRole || 'System Admin'
     setCurrentRole(initialRole)
