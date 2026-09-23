@@ -7,7 +7,6 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   
-  // ── Role State ──
   const [currentRole, setCurrentRole] = useState(() => {
     return localStorage.getItem('currentRole') || ''
   })
@@ -21,8 +20,6 @@ export function AuthProvider({ children }) {
       try {
         const parsed = JSON.parse(savedUser)
         setUser(parsed)
-        
-        // Restore role from saved user or localStorage
         const roles = parsed.roles || (parsed.role ? [parsed.role] : [])
         const savedRole = localStorage.getItem('currentRole')
         setCurrentRole(savedRole || roles[0]?.name || roles[0] || '')
@@ -32,7 +29,6 @@ export function AuthProvider({ children }) {
         localStorage.removeItem('currentRole')
       }
     }
-    
     setLoading(false)
   }, [])
 
@@ -44,34 +40,32 @@ export function AuthProvider({ children }) {
     })
 
     if (!res.ok) {
-      const data = await res.json().catch(() => ({}))
-      throw new Error(data.message || `Login failed (${res.status})`)
+      const errData = await res.json().catch(() => ({}))
+      throw new Error(errData.message || `Login failed (${res.status})`)
     }
 
-    const data = await res.json()
-    
-    // DEBUG: Log the full response to see structure
-    console.log('🔑 Login response:', data)
+    const resBody = await res.json()
+    console.log('🔑 Full login response:', resBody)
+
+    // The backend TransformInterceptor wraps the response in { data: {...}, message, statusCode }
+    // We need to unwrap it to find the token
+    const data = resBody.data || resBody
+    console.log('📦 Unwrapped data:', data)
     
     const userData = data.user || data
-    
-    // Extract token - check all possible property names
     const token = data.access_token || data.token || data.accessToken
     
     if (!token) {
-      console.error('❌ No token found in response:', data)
+      console.error('❌ No token found. Response structure:', resBody)
       throw new Error('Authentication failed: No token received from server')
     }
     
-    console.log('✅ Token received successfully:', token.substring(0, 30) + '...')
+    console.log('✅ Token received:', token.substring(0, 30) + '...')
     
-    // Store token & user
     localStorage.setItem('token', token)
     localStorage.setItem('user', JSON.stringify(userData))
-
     setUser(userData)
 
-    // Set initial role from backend response
     const roles = userData.roles || (userData.role ? [userData.role] : [])
     const initialRole = roles[0]?.name || roles[0] || currentRole || 'System Admin'
     setCurrentRole(initialRole)
@@ -93,13 +87,8 @@ export function AuthProvider({ children }) {
     localStorage.setItem('currentRole', role)
   }
 
-  // ── Permission Check ──
-  // Adjust this based on what your NestJS backend returns
   const hasPageAccess = (pageCode) => {
     if (!user) return false
-    
-    // Option 1: Backend returns permissions array on user
-    // e.g., user.permissions = [{ page_code: 'payments', ... }, ...]
     const permissions = user.permissions || user.role?.permissions || []
     if (permissions.length > 0) {
       return permissions.some(p => 
@@ -108,27 +97,10 @@ export function AuthProvider({ children }) {
         p === pageCode
       )
     }
-    
-    // Option 2: Backend returns role name and you want to hardcode mappings
-    // (Uncomment and adjust if needed)
-    /*
-    const rolePages = {
-      'System Admin': ['dashboard', 'resources', 'projects', 'payments', 'bulk-upload', 'master-data', 'users', 'audit', 'settings'],
-      'Finance Manager': ['dashboard', 'payments', 'bulk-upload', 'audit'],
-      'Finance Officer': ['dashboard', 'payments', 'bulk-upload'],
-      'Cluster Contact': ['dashboard', 'resources', 'projects'],
-      'Operation Lead': ['dashboard', 'projects', 'resources'],
-      'Management': ['dashboard', 'reports', 'audit'],
-      'Auditor': ['dashboard', 'audit'],
-    }
-    const allowed = rolePages[currentRole] || []
-    return allowed.includes(pageCode)
-    */
-    
-    // Option 3: Development fallback — allow all pages
     return true
   }
 
+  // ⚠️ IMPORTANT: This return statement MUST be inside the AuthProvider function
   return (
     <AuthContext.Provider value={{
       user,
