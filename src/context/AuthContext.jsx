@@ -11,7 +11,6 @@ export function AuthProvider({ children }) {
     return localStorage.getItem('currentRole') || ''
   })
 
-  // Restore session on mount
   useEffect(() => {
     const token = localStorage.getItem('token')
     const savedUser = localStorage.getItem('user')
@@ -47,8 +46,7 @@ export function AuthProvider({ children }) {
     const resBody = await res.json()
     console.log('🔑 Full login response:', resBody)
 
-    // The backend TransformInterceptor wraps the response in { data: {...}, message, statusCode }
-    // We need to unwrap it to find the token
+    // FIX: Unwrap the TransformInterceptor response
     const data = resBody.data || resBody
     console.log('📦 Unwrapped data:', data)
     
@@ -56,7 +54,7 @@ export function AuthProvider({ children }) {
     const token = data.access_token || data.token || data.accessToken
     
     if (!token) {
-      console.error('❌ No token found. Response structure:', resBody)
+      console.error('❌ No token found. Full response:', resBody)
       throw new Error('Authentication failed: No token received from server')
     }
     
@@ -100,7 +98,6 @@ export function AuthProvider({ children }) {
     return true
   }
 
-  // ⚠️ IMPORTANT: This return statement MUST be inside the AuthProvider function
   return (
     <AuthContext.Provider value={{
       user,
