@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 
 const AuthContext = createContext(null)
-
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
 export function AuthProvider({ children }) {
@@ -17,10 +16,12 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const token = localStorage.getItem('token')
     const savedUser = localStorage.getItem('user')
+    
     if (token && savedUser) {
       try {
         const parsed = JSON.parse(savedUser)
         setUser(parsed)
+        
         // Restore role from saved user or localStorage
         const roles = parsed.roles || (parsed.role ? [parsed.role] : [])
         const savedRole = localStorage.getItem('currentRole')
@@ -31,6 +32,7 @@ export function AuthProvider({ children }) {
         localStorage.removeItem('currentRole')
       }
     }
+    
     setLoading(false)
   }, [])
 
@@ -47,11 +49,26 @@ export function AuthProvider({ children }) {
     }
 
     const data = await res.json()
+    
+    // DEBUG: Log the full response to see structure
+    console.log('🔑 Login response:', data)
+    
     const userData = data.user || data
-
+    
+    // Extract token - check all possible property names
+    const token = data.access_token || data.token || data.accessToken
+    
+    if (!token) {
+      console.error('❌ No token found in response:', data)
+      throw new Error('Authentication failed: No token received from server')
+    }
+    
+    console.log('✅ Token received successfully:', token.substring(0, 30) + '...')
+    
     // Store token & user
-    localStorage.setItem('token', data.access_token || data.token)
+    localStorage.setItem('token', token)
     localStorage.setItem('user', JSON.stringify(userData))
+
     setUser(userData)
 
     // Set initial role from backend response
@@ -80,7 +97,7 @@ export function AuthProvider({ children }) {
   // Adjust this based on what your NestJS backend returns
   const hasPageAccess = (pageCode) => {
     if (!user) return false
-
+    
     // Option 1: Backend returns permissions array on user
     // e.g., user.permissions = [{ page_code: 'payments', ... }, ...]
     const permissions = user.permissions || user.role?.permissions || []
@@ -91,7 +108,7 @@ export function AuthProvider({ children }) {
         p === pageCode
       )
     }
-
+    
     // Option 2: Backend returns role name and you want to hardcode mappings
     // (Uncomment and adjust if needed)
     /*
@@ -107,17 +124,17 @@ export function AuthProvider({ children }) {
     const allowed = rolePages[currentRole] || []
     return allowed.includes(pageCode)
     */
-
+    
     // Option 3: Development fallback — allow all pages
     return true
   }
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      login, 
-      logout, 
-      loading, 
+    <AuthContext.Provider value={{
+      user,
+      login,
+      logout,
+      loading,
       isAuthenticated: !!user,
       currentRole,
       switchRole,
