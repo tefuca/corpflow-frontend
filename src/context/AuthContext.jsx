@@ -11,7 +11,6 @@ export function AuthProvider({ children }) {
     return localStorage.getItem('currentRole') || ''
   })
 
-  // Restore session on mount
   useEffect(() => {
     const token = localStorage.getItem('token')
     const savedUser = localStorage.getItem('user')
@@ -45,29 +44,26 @@ export function AuthProvider({ children }) {
     }
 
     const resBody = await res.json()
-    console.log('🔑 Full login response:', resBody)
+    console.log('🔑 Full response:', resBody)
 
-    // ⚠️ CRITICAL FIX: Unwrap the TransformInterceptor response
-    // The backend wraps everything in { data: {...}, message, statusCode }
+    // ⚠️ CRITICAL: Unwrap TransformInterceptor response
     const data = resBody.data || resBody
-    console.log('📦 Unwrapped data:', data)
+    console.log('📦 Unwrapped:', data)
     
     const userData = data.user || data
     const token = data.access_token || data.token || data.accessToken
     
     if (!token) {
-      console.error('❌ No token found. Full response:', resBody)
-      throw new Error('Authentication failed: No token received from server')
+      console.error('❌ No token! Full response:', resBody)
+      throw new Error('No token received')
     }
     
-    console.log('✅ Token received successfully:', token.substring(0, 30) + '...')
+    console.log('✅ Token:', token.substring(0, 30) + '...')
     
-    // Store token & user
     localStorage.setItem('token', token)
     localStorage.setItem('user', JSON.stringify(userData))
     setUser(userData)
 
-    // Set initial role from backend response
     const roles = userData.roles || (userData.role ? [userData.role] : [])
     const initialRole = roles[0]?.name || roles[0] || currentRole || 'System Admin'
     setCurrentRole(initialRole)
